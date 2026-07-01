@@ -2,7 +2,7 @@
 // API: always relative path '' → Next.js proxy → backend (no CORS ever)
 // WS:  fetched at runtime from /api/ws-url → backend port always correct
 
-export const API_BASE = '';
+export const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || '';
 
 // WS URL is resolved lazily at runtime by websocket.ts via getWsUrl()
 // This avoids relying on NEXT_PUBLIC_ build-time vars that require a full rebuild.
@@ -40,21 +40,24 @@ async function _resolveWsUrl(): Promise<string> {
         /^192\.168\./.test(hostname) ||
         /^10\./.test(hostname) ||
         /^172\.(1[6-9]|2\d|3[01])\./.test(hostname) ||
-        /^169\.254\./.test(hostname);
+        /^169\.254\./.test(hostname) ||
+        /^100\./.test(hostname);
+
+    const tunnel = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+    if (tunnel) {
+        return tunnel.replace(/^http/, 'ws');
+    }
 
     if (isLocal) {
         try {
-            const res = await fetch('/api/ws-url');
+            const res = await fetch(`${API_BASE}/api/ws-url`);
             const { wsPort } = await res.json();
             return `ws://${hostname}:${wsPort}`;
         } catch {
             return `ws://${hostname}:3500`;
         }
     } else {
-        const tunnel = process.env.NEXT_PUBLIC_BACKEND_URL || '';
-        return tunnel
-            ? tunnel.replace(/^http/, 'ws')
-            : `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`;
+        return `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${window.location.host}`;
     }
 }
 

@@ -152,7 +152,7 @@ export function useWebSocket() {
                 return;
             }
             graceActiveRef.current = false;
-            setState(prev => ({ ...prev, connected: false, detected: false }));
+            setState(prev => ({ ...prev, connected: false }));
         });
 
         const offStatus = wsService.on('status', (data) => {

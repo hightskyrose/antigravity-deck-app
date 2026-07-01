@@ -9,6 +9,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@capacitor/core": "^8.4.1",
     "@git-diff-view/file": "^0.1.1",
     "@git-diff-view/react": "^0.1.1",
     "@tailwindcss/typography": "^0.5.19",
@@ -29,6 +30,8 @@
     "tailwind-merge": "^3.5.0"
   },
   "devDependencies": {
+    "@capacitor/android": "^8.4.1",
+    "@capacitor/cli": "^8.4.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

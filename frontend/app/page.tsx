@@ -470,9 +470,9 @@ export default function Home() {
   // === Determine what to show in main panel ===
   // When LS not detected, force the detection screen regardless of stored state.
   const anyOverlay = showAccountInfo || showSettings || showLogs || showSourceControl || showResources || showMcp || showWorkflows || showMemories || showRepoInfo;
-  const showChat = detected && (currentConvId !== null || newChatMode);
+  const showChat = (currentConvId !== null || newChatMode);
   // Conversation History is the default main view whenever nothing else is active.
-  const showHistoryView = detected && !showChat && !anyOverlay;
+  const showHistoryView = !showChat && !anyOverlay;
 
   return (
     <AuthGate>
@@ -599,64 +599,12 @@ export default function Home() {
           )}
 
           {/* === Main panel content === */}
-          {!detected && (
-            <div className="flex-1 flex items-center justify-center">
-              {swapping ? (
-                <div className="text-center space-y-4 max-w-sm">
-                  <div className="flex items-center justify-center gap-3">
-                    <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
-                    <h2 className="text-xl font-semibold text-foreground/80">Switching Account...</h2>
-                  </div>
-                  <p className="text-sm text-muted-foreground">
-                    Closing IDE, swapping profile, and relaunching. This takes ~10 seconds.
-                  </p>
-                  <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
-                    <span className="relative flex h-2 w-2">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400/75" />
-                      <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-                    </span>
-                    <span>Waiting for Antigravity to restart...</span>
-                  </div>
-                </div>
-              ) : (
-              <div className="text-center space-y-5 max-w-sm">
-                <div className="flex items-center justify-center gap-3">
-                  <WifiOff className="w-8 h-8 text-muted-foreground/50" />
-                  <h2 className="text-xl font-semibold text-foreground/80">Antigravity Not Detected</h2>
-                </div>
-                <ol className="text-left space-y-2.5 rounded-lg bg-muted/10 border border-border/30 px-5 py-4">
-                  {[
-                    'Open Antigravity IDE',
-                    'Open a project folder in Antigravity',
-                    'Antigravity Deck will auto-detect it within ~10 seconds',
-                  ].map((text, i) => (
-                    <li key={i} className="flex items-start gap-3 text-sm text-muted-foreground">
-                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-muted/30 flex items-center justify-center text-xs font-medium text-muted-foreground/80">
-                        {i + 1}
-                      </span>
-                      <span>{text}</span>
-                    </li>
-                  ))}
-                </ol>
-                <LaunchIdeButton />
-                <div className="flex items-center justify-center gap-2 text-xs text-muted-foreground/70">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400/75" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-400" />
-                  </span>
-                  <span>Detecting Antigravity Language Server...</span>
-                </div>
-              </div>
-              )}
-            </div>
-          )}
+          {showAccountInfo && <AccountInfoView />}
 
-          {detected && showAccountInfo && <AccountInfoView />}
-
-          {detected && showSettings && <SettingsView />}
+          {showSettings && <SettingsView />}
 
           {/* Always mounted — WS stays alive, events accumulate in background */}
-          <div className={detected && showLogs ? 'flex flex-col flex-1 min-h-0 overflow-hidden' : 'hidden'}>
+          <div className={showLogs ? 'flex flex-col flex-1 min-h-0 overflow-hidden' : 'hidden'}>
             <AgentLogsView />
           </div>
 

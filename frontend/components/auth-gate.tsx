@@ -32,7 +32,17 @@ export function AuthGate({ children }: AuthGateProps) {
             setAuthKey(urlKey.trim());
         }
 
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        const hostname = window.location.hostname;
+        const isLocal =
+            hostname === 'localhost' ||
+            hostname === '127.0.0.1' ||
+            /^192\.168\./.test(hostname) ||
+            /^10\./.test(hostname) ||
+            /^172\.(1[6-9]|2\d|3[01])\./.test(hostname) ||
+            /^169\.254\./.test(hostname) ||
+            /^100\./.test(hostname);
+
+        if (isLocal) {
             setAuthenticated(true);
             return;
         }
