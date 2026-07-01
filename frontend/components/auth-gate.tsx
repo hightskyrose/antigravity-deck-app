@@ -32,20 +32,8 @@ export function AuthGate({ children }: AuthGateProps) {
             setAuthKey(urlKey.trim());
         }
 
-        const hostname = window.location.hostname;
-        const isLocal =
-            hostname === 'localhost' ||
-            hostname === '127.0.0.1' ||
-            /^192\.168\./.test(hostname) ||
-            /^10\./.test(hostname) ||
-            /^172\.(1[6-9]|2\d|3[01])\./.test(hostname) ||
-            /^169\.254\./.test(hostname) ||
-            /^100\./.test(hostname);
-
-        if (isLocal) {
-            setAuthenticated(true);
-            return;
-        }
+        // Removed isLocal bypass since Capacitor apps run on localhost but 
+        // still need to authenticate with the remote backend.
 
         const savedKey = urlKey || getAuthKey();
         if (!savedKey) {
