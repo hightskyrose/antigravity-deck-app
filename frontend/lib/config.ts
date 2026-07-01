@@ -2,7 +2,9 @@
 // API: always relative path '' → Next.js proxy → backend (no CORS ever)
 // WS:  fetched at runtime from /api/ws-url → backend port always correct
 
-export const API_BASE = process.env.NEXT_PUBLIC_BACKEND_URL || '';
+export const API_BASE = (typeof window !== 'undefined' && localStorage.getItem('custom-api-base')) 
+    ? localStorage.getItem('custom-api-base')! 
+    : (process.env.NEXT_PUBLIC_BACKEND_URL || '');
 
 // WS URL is resolved lazily at runtime by websocket.ts via getWsUrl()
 // This avoids relying on NEXT_PUBLIC_ build-time vars that require a full rebuild.

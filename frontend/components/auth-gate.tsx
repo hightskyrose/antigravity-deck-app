@@ -62,18 +62,43 @@ export function AuthGate({ children }: AuthGateProps) {
         setChecking(true);
         setError('');
 
+        let submittedKey = key.trim();
+        let customApiBase = null;
+
+        if (submittedKey.startsWith('http')) {
+            try {
+                const url = new URL(submittedKey);
+                submittedKey = url.searchParams.get('key') || '';
+                
+                // If they pasted the frontend URL, assume backend is frontend port - 1
+                let port = url.port;
+                if (port === '9808') port = '9807';
+                
+                customApiBase = `${url.protocol}//${url.hostname}${port ? ':' + port : ''}`;
+            } catch {
+                // Ignore parse error, use as-is
+            }
+        }
+
         try {
-            const res = await fetch(`${API_BASE}/api/settings`, {
-                headers: { 'X-Auth-Key': key.trim() }
+            const res = await fetch(`${customApiBase || API_BASE}/api/settings`, {
+                headers: { 'X-Auth-Key': submittedKey }
             });
             if (res.ok) {
-                setAuthKey(key.trim());
+                if (customApiBase) {
+                    localStorage.setItem('custom-api-base', customApiBase);
+                }
+                setAuthKey(submittedKey);
                 setAuthenticated(true);
+                // Reload if we changed the base URL to apply it to all components
+                if (customApiBase && customApiBase !== API_BASE) {
+                    window.location.reload();
+                }
             } else {
                 setError('Invalid key');
             }
         } catch {
-            setError('Cannot reach server');
+            setError(`Cannot reach server (${customApiBase || API_BASE})`);
         } finally {
             setChecking(false);
         }
@@ -87,15 +112,16 @@ export function AuthGate({ children }: AuthGateProps) {
                 <CardHeader className="text-center pb-2">
                     <div className="mb-3"><Lock className="h-8 w-8 text-muted-foreground mx-auto" /></div>
                     <CardTitle className="text-xl">AntigravityChat</CardTitle>
-                    <CardDescription>Enter your access key to continue</CardDescription>
+                    <CardDescription>Auth Key or Connection URL</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <form onSubmit={handleSubmit} className="space-y-4">
                         <Input
-                            type="password"
+                            type="text"
                             value={key}
                             onChange={(e) => setKey(e.target.value)}
-                            placeholder="Access key"
+                            placeholder="Paste key or http://.../?key=..."
+                            disabled={checking}
                             autoFocus
                         />
                         {error && (
