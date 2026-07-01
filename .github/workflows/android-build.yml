@@ -39,6 +39,20 @@ jobs:
       working-directory: frontend
       run: |
         npx cap init "Antigravity Deck" "com.antigravity.deck" --web-dir out
+        cat << 'EOF' > capacitor.config.ts
+        import type { CapacitorConfig } from '@capacitor/cli';
+
+        const config: CapacitorConfig = {
+          appId: 'com.antigravity.deck',
+          appName: 'Antigravity Deck',
+          webDir: 'out',
+          server: {
+            cleartext: true
+          }
+        };
+
+        export default config;
+        EOF
 
     - name: Patch next.config.ts for Static Export
       working-directory: frontend
